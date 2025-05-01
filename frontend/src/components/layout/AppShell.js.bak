@@ -1,0 +1,172 @@
+import React, { useState } from 'react';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  AppShell as MantineAppShell,
+  Navbar,
+  Header,
+  Text,
+  Burger,
+  useMantineTheme,
+  Group,
+  Button,
+  Stack,
+  Box,
+  ActionIcon,
+  ThemeIcon,
+  Divider,
+} from '@mantine/core';
+import { 
+  IconHome,
+  IconUpload,
+  IconPhoto,
+  IconKey,
+  IconChartBar,
+  IconLogout,
+  IconDeviceAnalytics,
+} from '@tabler/icons-react';
+import { useAuth } from '../../contexts/AuthContext';
+
+const NavbarLink = ({ icon, label, to, active, onClick }) => {
+  const theme = useMantineTheme();
+  
+  return (
+    <Box
+      component={Link}
+      to={to}
+      style={{
+        display: 'block',
+        width: '100%',
+        padding: theme.spacing.xs,
+        borderRadius: theme.radius.sm,
+        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+        backgroundColor: active 
+          ? theme.colorScheme === 'dark' 
+            ? theme.colors.dark[6] 
+            : theme.colors.gray[1]
+          : 'transparent',
+        '&:hover': {
+          backgroundColor: theme.colorScheme === 'dark' 
+            ? theme.colors.dark[6] 
+            : theme.colors.gray[1],
+        },
+        textDecoration: 'none',
+      }}
+      onClick={onClick}
+    >
+      <Group>
+        <ThemeIcon variant={active ? 'filled' : 'light'} size="md">
+          {icon}
+        </ThemeIcon>
+        <Text size="sm">{label}</Text>
+      </Group>
+    </Box>
+  );
+};
+
+const AppShell = () => {
+  const theme = useMantineTheme();
+  const [opened, setOpened] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+  
+  const closeNavbar = () => {
+    setOpened(false);
+  };
+  
+  const isActive = (path) => location.pathname === path;
+  
+  return (
+    <MantineAppShell
+      padding="md"
+      header={{ height: 60 }}
+      navbar={{ 
+        width: 250, 
+        breakpoint: 'sm', 
+        collapsed: { mobile: !opened }
+      }}
+    >
+      <MantineAppShell.Header p="md">
+        <Group justify="space-between" style={{ height: '100%' }}>
+          <Group>
+            <Burger
+              opened={opened}
+              onClick={() => setOpened((o) => !o)}
+              hiddenFrom="sm"
+              size="sm"
+            />
+            <Text size="lg" fw={700}>Image Processing SaaS</Text>
+          </Group>
+          {user && (
+            <Text size="sm">Logged in as: {user.email}</Text>
+          )}
+        </Group>
+      </MantineAppShell.Header>
+      
+      <MantineAppShell.Navbar p="md">
+        <Navbar.Section grow>
+          <Stack gap="xs">
+            <NavbarLink 
+              icon={<IconHome />} 
+              label="Home" 
+              to="/" 
+              active={isActive('/')}
+              onClick={closeNavbar}
+            />
+            <NavbarLink 
+              icon={<IconUpload />} 
+              label="Upload Image" 
+              to="/upload" 
+              active={isActive('/upload')}
+              onClick={closeNavbar}
+            />
+            <NavbarLink 
+              icon={<IconPhoto />} 
+              label="My Images" 
+              to="/images" 
+              active={isActive('/images')}
+              onClick={closeNavbar}
+            />
+            <NavbarLink 
+              icon={<IconDeviceAnalytics />} 
+              label="API Usage" 
+              to="/usage" 
+              active={isActive('/usage')}
+              onClick={closeNavbar}
+            />
+            <NavbarLink 
+              icon={<IconKey />} 
+              label="API Keys" 
+              to="/api-keys" 
+              active={isActive('/api-keys')}
+              onClick={closeNavbar}
+            />
+          </Stack>
+        </Navbar.Section>
+        
+        <Navbar.Section>
+          <Divider my="sm" />
+          <Button 
+            variant="subtle" 
+            leftSection={<IconLogout size={16} />}
+            onClick={handleLogout}
+            fullWidth
+          >
+            Logout
+          </Button>
+        </Navbar.Section>
+      </MantineAppShell.Navbar>
+      
+      <MantineAppShell.Main>
+        <Outlet />
+      </MantineAppShell.Main>
+    </MantineAppShell>
+  );
+};
+
+export default AppShell; 

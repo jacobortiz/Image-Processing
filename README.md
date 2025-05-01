@@ -1,6 +1,6 @@
 # Image Processing SaaS
 
-A Software-as-a-Service application for image processing, featuring user authentication, image uploads, resizing, and OCR text extraction.
+An application for image processing, featuring user authentication, image uploads, resizing, and OCR text extraction.
 
 ## Features
 
